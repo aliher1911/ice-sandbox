@@ -1,0 +1,9 @@
+*.vcd
+*_tb
+*.asc
+*.blif
+*.bin
+*.html
+*.rpt
+*_syn.v
+*_syntb
