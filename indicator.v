@@ -2,7 +2,7 @@ module indicator(input            clk,
                  input            reset, 
                  input [7:0]      data,
                  input            ready,
-                 output reg [4:0] leds
+                 output reg [0:4] leds
                  );
 
 initial begin

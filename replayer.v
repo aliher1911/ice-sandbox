@@ -1,9 +1,10 @@
 module replayer(
                 input        clk,
+                input        enable, 
                 input        start,
-                input        count, 
                 input [7:0]  limit,
-                output reg   next,
+                output reg   read,  // memory read signal
+                output reg   ready, // data ready on the bus
                 output [7:0] addr
                 );
    parameter real      TICK_PER_SEC = 1; // once a sec
@@ -12,24 +13,24 @@ module replayer(
    // delay in clock
    localparam integer  PERIOD = CLOCK_FREQ_HZ * TICK_PER_SEC;
 
-   // delay count
+   // delay enable
    reg [$clog2(PERIOD):0] cycle_cnt;
    reg [7:0]              seq;
 
    always @(posedge clk) begin
-      next <= 0;
+      read <= 0;
       if (start) begin
          // initialize
          seq <= 0;
          cycle_cnt <= 0;
-         next <= 1;
+         read <= 1;
       end else begin
-         if (count) begin
-            // if counting
+         if (enable) begin
+            // if replaying
             if (cycle_cnt == PERIOD) begin
-               // if we reached tick counter, reset it and bump seq
+               // if we reached tick enableer, reset it and bump seq
                cycle_cnt <= 0;
-               next <= 1;
+               read <= 1;
                if (seq == (limit - 1)) begin
                   // seq reached end, reset
                   seq <= 0;
@@ -45,7 +46,9 @@ module replayer(
       end
    end
 
-   // output bus only if counting
-   assign addr = count ? seq : 8'bz;
+   always @(posedge clk) ready <= read;
+   
+   // output bus only if enabled
+   assign addr = enable ? seq : 8'bz;
    
 endmodule // replayer

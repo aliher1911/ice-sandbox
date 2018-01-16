@@ -7,7 +7,7 @@ module memory(
               );
 
    // data storage
-   reg [7:0]              array [0:255];
+   reg [7:0]              array [0:2048];
    // output
    reg [7:0]              out;
    reg                    ready;
@@ -17,7 +17,8 @@ module memory(
       if (wr) begin
          // writing to memory
          array[addr] <= data;
-      end else if (rd) begin
+      end
+      if (rd) begin
          // reading from memory
          out <= array[addr];
          ready <= 1;

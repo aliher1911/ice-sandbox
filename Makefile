@@ -1,11 +1,14 @@
 PROJ = rs232
 SOURCES = rs232.v rs232rx.v indicator.v memory.v recorder.v replayer.v sequencer.v
 SIM_RES = rs232rx_tb.vcd indicator_tb.vcd memory_tb.vcd replayer_tb.vcd \
-          sequencer_tb.vcd recorder_tb.vcd $(PROJ)_syntb.vcd
+          sequencer_tb.vcd recorder_tb.vcd \
+          $(PROJ)_tb.vcd $(PROJ)_syntb.vcd
 PIN_DEF = icestick.pcf
 DEVICE = hx1k
 
-VIEW_GEN=/Users/ali/Documents/IceTools/ice40_viewer/iceview_html.py
+-include config.mk
+
+VIEW_GEN ?= iceview_html.py
 
 all: $(PROJ).rpt $(PROJ).bin $(PROJ).html
 
@@ -13,6 +16,10 @@ test: $(SIM_RES)
 
 $(PROJ).blif: $(SOURCES)
 	yosys -p 'synth_ice40 -top top -blif $@' $^
+
+# top level testbench needs all sources
+$(PROJ)_tb: $(PROJ)_tb.v $(SOURCES)
+	iverilog -o $@ $^
 
 %.blif: %.v
 	yosys -p 'synth_ice40 -top top -blif $@' $^

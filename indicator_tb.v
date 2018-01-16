@@ -6,15 +6,18 @@ module testbench;
 
    reg [7:0] data;
    reg       ready;
-	wire      LED1;
-	wire      LED2;
-	wire      LED3;
-	wire      LED4;
-	wire      LED5;
+   reg       reset;
+   
+   wire      LED1;
+   wire      LED2;
+   wire      LED3;
+   wire      LED4;
+   wire      LED5;
 
    // instantiate module
    indicator uut(
                  .clk(clk),
+                 .reset(reset),
                  .data(data),
                  .ready(ready),
                  .leds({LED1, LED2, LED3, LED4, LED5})
@@ -34,7 +37,15 @@ module testbench;
       end
    endtask // set_data
 
-   // test data storage?
+   task do_reset;
+      begin
+         @(posedge clk);
+         reset <= 1;
+         @(posedge clk);
+         reset <= 0;
+      end
+   endtask // reset
+   
    reg [4095:0] vcdfile;
 
    // define test
@@ -53,6 +64,10 @@ module testbench;
       set_data("1");
       set_data("2");
       set_data("2");
+
+      do_reset();
+
+      set_data("1");
       
       repeat (100) @(posedge clk);
       
